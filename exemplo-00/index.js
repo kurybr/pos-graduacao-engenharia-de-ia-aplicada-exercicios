@@ -1,4 +1,4 @@
-import fs from '@tensorflow/tfjs-node'
+import tf from '@tensorflow/tfjs-node'
 
 
 // Exemplo de pessoas para treino (cada pessoa com idade, cor e localização)
@@ -39,30 +39,6 @@ const tensorLabels = [
 const inputXs = tf.tensor2d(tensorPessoasNormalizado)
 const outputYs = tf.tensor2d(tensorLabels)
 
-// quanto mais dado melhor!
-// assim o algoritmo consegue entender melhor os padrões complexos
-// dos dados
-const model = await trainModel(inputXs, outputYs)
 
-const pessoa = { nome: 'zé', idade: 28, cor: 'verde', localizacao: "Curitiba" }
-// Normalizando a idade da nova pessoa usando o mesmo padrão do treino
-// Exemplo: idade_min = 25, idade_max = 40, então (28 - 25) / (40 - 25 ) = 0.2
-
-const pessoaTensorNormalizado = [
-    [
-        0.2, // idade normalizada
-        1,    // cor azul
-        0,    // cor vermelho
-        0,    // cor verde
-        0,    // localização São Paulo
-        1,    // localização Rio
-        0     // localização Curitiba
-    ]
-]
-
-const predictions = await predict(model, pessoaTensorNormalizado)
-const results = predictions
-    .sort((a, b) => b.prob - a.prob)
-    .map(p => `${labelsNomes[p.index]} (${(p.prob * 100).toFixed(2)}%)`)
-    .join('\n')
-console.log(results)
+inputXs.print();
+outputYs.print();
