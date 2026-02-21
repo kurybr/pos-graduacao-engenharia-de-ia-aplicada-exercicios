@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "exemplo-00": "node --no-warnings --watch tensores.js",
+    "aula-00": "node --no-warnings --watch index.js"
+  },
+  "types": "module",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "4.22"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
