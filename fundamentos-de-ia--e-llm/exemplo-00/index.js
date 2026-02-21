@@ -73,6 +73,22 @@ async function trainModel(inputXs, outputYs) {
 
 
 
+    return model;
+}
+
+async function predict(model, pessoa) {
+    // Precisamos transformar o array para um tensor. 
+    const tfInput = tf.tensor2d(pessoa)
+
+    // Faz a predição ( output será um tensor com 3 posições)
+    const pred = await model.predict(tfInput)
+
+    const predArray = await pred.array()
+    
+    console.log('\n\n\n\n\n\n\n')
+    console.log(predArray)
+
+    return predArray[0].map((prob, index) => ({ prob, index }));
 
 }
 
@@ -88,7 +104,6 @@ const idade_normalizada = (min, max, idade) => {
 //     { nome: "Erick", idade: 30, cor: "azul", localizacao: "São Paulo" },
 //     { nome: "Ana", idade: 25, cor: "vermelho", localizacao: "Rio" },
 //     { nome: "Carlos", idade: 40, cor: "verde", localizacao: "Curitiba" },
-//     { nome: "Jorge", idade: 33, cor: "verde", localizacao: "São Paulo" }
 // ];
 
 // Vetores de entrada com valores já normalizados e one-hot encoded
@@ -98,10 +113,6 @@ const idade_normalizada = (min, max, idade) => {
 //     [0, 0, 1, 0, 0, 1, 0],    // Ana
 //     [1, 0, 0, 1, 0, 0, 1]     // Carlos
 // ]
-
-console.log('\n\n\n\n\n\n\n')
-console.log(idade_normalizada(25, 40, 33))
-console.log('\n\n\n\n\n\n\n')
 
 // Usamos apenas os dados numéricos, como a rede neural só entende números.
 // tensorPessoasNormalizado corresponde ao dataset de entrada do modelo.
@@ -133,4 +144,35 @@ outputYs.print();
 
 
 // Quantos mais dados, melhor
-const model = trainModel(inputXs, outputYs)
+const model = await trainModel(inputXs, outputYs)
+
+
+const pessoa = { nome : 'Debora', idade : 28, cor : 'verde', localizacao : 'Curitiba' }
+// Normalizando a idade
+//idade_normalizada(25, 40, 28) // 0.2 é a idade normalizada de 28 anos
+
+const pessoaTensorNormalizado = [
+    [
+        0.2, // Idade normalizada
+        1, // cor azul
+        0, // cor vermelho
+        0, // cor verde
+        0, // localização São Paulo
+        1, // localização Rio
+        0, // localização Curitiba
+    ]
+]
+
+const predictions = await predict(model, pessoaTensorNormalizado);
+
+/**
+ * Mapeia pelo maior ( ordenando pelo que tem a maior probabilidade)
+ */
+const results = predictions
+    .sort((a, b) => b.prob - a.prob)
+    .map(({ prob, index }) => `${labelsNomes[index]}: (${prob.toFixed(2)}%)`)
+    .join('\n');
+
+console.log('\n\n\n\n\n\n\n')
+console.log(results)
+console.log('\n\n\n\n\n\n\n')
